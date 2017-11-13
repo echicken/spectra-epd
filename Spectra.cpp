@@ -32,7 +32,7 @@ void Spectra::send_byte(uint8_t data) {
     }
 }
 
-void Spectra::send_data(uint8_t index, const uint8_t* data, uint32_t len, uint32_t offset) {
+void Spectra::send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16_t offset) {
     digitalWrite(PIN_DC, LOW);
     digitalWrite(PIN_CS, LOW);
     send_byte(index);
