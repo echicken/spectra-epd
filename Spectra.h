@@ -16,8 +16,6 @@ class Spectra
         int PIN_DC;
         int PIN_RESET;
         int PIN_BUSY;
-        void esp_delay_us(uint32_t us);
-        void esp_delay_ms(uint32_t ms);
         void send_byte(uint8_t data);
         void send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16_t offset);
         void busy_wait();

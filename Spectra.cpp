@@ -10,25 +10,11 @@ Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY) {
     PIN_BUSY = BUSY;
 }
 
-void Spectra::esp_delay_us(uint32_t us) {
-    for (int n = 0; n < us; n++) {
-        delayMicroseconds(1);
-        yield();
-    }
-}
-
-void Spectra::esp_delay_ms(uint32_t ms) {
-    for (int n = 0; n < ms; n++) {
-        esp_delay_us(1000);
-    }
-}
-
 void Spectra::send_byte(uint8_t data) {
     for (int i = 0; i < 8; i++) {
         digitalWrite(PIN_SDA, ((data>>(7-i))&1) == 1 ? HIGH : LOW);
         digitalWrite(PIN_SCL, HIGH);
         digitalWrite(PIN_SCL, LOW);
-        yield();
     }
 }
 
@@ -47,7 +33,6 @@ void Spectra::send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16
 
 void Spectra::busy_wait() {
     while (digitalRead(PIN_BUSY) != HIGH) {
-        yield();
     }
 }
 
@@ -62,16 +47,16 @@ void Spectra::init() {
 
 void Spectra::draw(const uint8_t buffer[30000]) {
 
-    esp_delay_ms(5);
+    delay(5);
     digitalWrite(PIN_RESET, HIGH);
 
-    esp_delay_ms(5);
+    delay(5);
     digitalWrite(PIN_RESET, LOW);
 
-    esp_delay_ms(10);
+    delay(10);
     digitalWrite(PIN_RESET, HIGH);
 
-    esp_delay_ms(5);
+    delay(5);
     digitalWrite(PIN_CS, HIGH);
 
     uint8_t data1[] = { 0x0E };
@@ -97,15 +82,15 @@ void Spectra::draw(const uint8_t buffer[30000]) {
 
     send_data(0x10, buffer, 15000, 0);
     send_data(0x13, buffer, 15000, 15000);
-    esp_delay_ms(50);
+    delay(50);
 
     uint8_t data8[] = { 0x00 };
     send_data(0x04, data8, 1, 0);    // Power on
-    esp_delay_ms(5);
+    delay(5);
     busy_wait();
 
     send_data(0x12, data8, 1, 0);    // Display Refresh
-    esp_delay_ms(5);
+    delay(5);
     busy_wait();
 
     send_data(0x02, data8, 1, 0);    // Turn off DC/DC
