@@ -1,7 +1,7 @@
 # spectra-epd
 Arduino library for using Pervasive Displays Spectra 4.2" E2417ES053
 
-###ESP-32 example
+### ESP-32 example
 
 SPI_DELAY_US is an inter-bit delay value in microseconds.  On the ESP-32 a
 value of 4 seems to slow things down enough to get a reliable transfer.  Other
