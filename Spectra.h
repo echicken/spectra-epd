@@ -6,7 +6,7 @@
 class Spectra
 {
     public:
-        Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY);
+        Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS, int SPI_DELAY_US);
         void init();
         void draw(const uint8_t buffer[30000]);
     private:
@@ -16,6 +16,9 @@ class Spectra
         int PIN_DC;
         int PIN_RESET;
         int PIN_BUSY;
+        int PIN_BS;
+        int SPI_DELAY;
+        void delay_ms(uint32_t ms);
         void send_byte(uint8_t data);
         void send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16_t offset);
         void busy_wait();

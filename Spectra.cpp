@@ -1,13 +1,22 @@
 #include <Arduino.h>
 #include "Spectra.h"
 
-Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY) {
+Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS, int SPI_DELAY_US) {
     PIN_SCL = SCL;
     PIN_SDA = SDA;
     PIN_CS = CS;
     PIN_DC = DC;
     PIN_RESET = RESET;
     PIN_BUSY = BUSY;
+    PIN_BS = BS;
+    SPI_DELAY = SPI_DELAY_US;
+}
+
+void Spectra::delay_ms(uint32_t ms) {
+    while (ms) {
+        delayMicroseconds(1000);
+        ms--;
+    }
 }
 
 void Spectra::send_byte(uint8_t data) {
@@ -15,6 +24,8 @@ void Spectra::send_byte(uint8_t data) {
         digitalWrite(PIN_SDA, ((data>>(7-i))&1) == 1 ? HIGH : LOW);
         digitalWrite(PIN_SCL, HIGH);
         digitalWrite(PIN_SCL, LOW);
+        // This is some magic-number slowdown bullshit.  ESP-32 plays nice with a 4us inter-bit delay.
+        delayMicroseconds(SPI_DELAY);
     }
 }
 
@@ -43,20 +54,25 @@ void Spectra::init() {
     pinMode(PIN_DC, OUTPUT);
     pinMode(PIN_RESET, OUTPUT);
     pinMode(PIN_BUSY, INPUT);
+    pinMode(PIN_BS, OUTPUT);
+    delay_ms(5);
 }
 
 void Spectra::draw(const uint8_t buffer[30000]) {
 
-    delay(5);
+    delay_ms(5);
+    digitalWrite(PIN_BS, HIGH);
+
+    delay_ms(5);
     digitalWrite(PIN_RESET, HIGH);
 
-    delay(5);
+    delay_ms(5);
     digitalWrite(PIN_RESET, LOW);
 
-    delay(10);
+    delay_ms(10);
     digitalWrite(PIN_RESET, HIGH);
 
-    delay(5);
+    delay_ms(5);
     digitalWrite(PIN_CS, HIGH);
 
     uint8_t data1[] = { 0x0E };
@@ -82,15 +98,15 @@ void Spectra::draw(const uint8_t buffer[30000]) {
 
     send_data(0x10, buffer, 15000, 0);
     send_data(0x13, buffer, 15000, 15000);
-    delay(50);
+    delay_ms(50);
 
     uint8_t data8[] = { 0x00 };
     send_data(0x04, data8, 1, 0);    // Power on
-    delay(5);
+    delay_ms(5);
     busy_wait();
 
     send_data(0x12, data8, 1, 0);    // Display Refresh
-    delay(5);
+    delay_ms(5);
     busy_wait();
 
     send_data(0x02, data8, 1, 0);    // Turn off DC/DC
@@ -101,5 +117,6 @@ void Spectra::draw(const uint8_t buffer[30000]) {
     digitalWrite(PIN_SDA, LOW);
     digitalWrite(PIN_SCL, LOW);
     digitalWrite(PIN_RESET, LOW);
+    digitalWrite(PIN_BS, LOW);
 
 }
