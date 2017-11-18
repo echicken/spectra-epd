@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "Spectra.h"
 
-Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS, int SPI_DELAY_US) {
+Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS) {
     PIN_SCL = SCL;
     PIN_SDA = SDA;
     PIN_CS = CS;
@@ -9,7 +9,6 @@ Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS, 
     PIN_RESET = RESET;
     PIN_BUSY = BUSY;
     PIN_BS = BS;
-    SPI_DELAY = SPI_DELAY_US;
 }
 
 void Spectra::delay_ms(uint32_t ms) {
