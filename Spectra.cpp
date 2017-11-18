@@ -24,9 +24,8 @@ void Spectra::send_byte(uint8_t data) {
         digitalWrite(PIN_SDA, ((data>>(7-i))&1) == 1 ? HIGH : LOW);
         digitalWrite(PIN_SCL, HIGH);
         digitalWrite(PIN_SCL, LOW);
-        // This is some magic-number slowdown bullshit.  ESP-32 plays nice with a 4us inter-bit delay.
-        delayMicroseconds(SPI_DELAY);
     }
+    yield();
 }
 
 void Spectra::send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16_t offset) {
@@ -44,6 +43,7 @@ void Spectra::send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16
 
 void Spectra::busy_wait() {
     while (digitalRead(PIN_BUSY) != HIGH) {
+        yield();
     }
 }
 
