@@ -58,6 +58,101 @@ void Spectra::init() {
     delay_ms(5);
 }
 
+void Spectra::set_pixel(int x, int y, int frame) {
+    int i = ((y * EPD_WIDTH) + x);
+    int byte_index = i / 8;
+    int bit_index = 7 - (i % 8);
+    if (frame == FRAME_WHT) {
+        buffer[byte_index] |= (0<<bit_index);
+        buffer[15000 + byte_index] |= (0<<bit_index);
+    } else if (frame == FRAME_BLK) {
+        buffer[byte_index] |= (1<<bit_index);
+        buffer[15000 + byte_index] |= (0<<bit_index);
+    } else if (frame == FRAME_RED) {
+        buffer[byte_index] |= (0<<bit_index);
+        buffer[15000 + byte_index] |= (1<<bit_index);
+    }
+}
+
+void Spectra::line(int x0, int y0, int x1, int y1, int frame) {
+    int dx = abs(x1 - x0);
+    int sx = x0 < x1 ? 1 : -1;
+    int dy = abs(y1 - y0);
+    int sy = y0 < y1 ? 1 : -1;
+    int err = (dx > dy ? dx : -dy) / 2;
+    int e2;
+    for(;;) {
+        set_pixel(x0, y0, frame);
+        if (x0 == x1 && y0 == y1) break;
+        e2 = err;
+        if (e2 > -dx) {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dy) {
+            err += dx;
+            y0 += sy;
+        }
+    }
+}
+
+void Spectra::rectangle(int x0, int y0, int x1, int y1, int frame, bool fill) {
+    line(x0, y0, x1, y0, frame);
+    if (!fill) {
+        line(x0, y0, x1, y1, frame);
+        line(x1, y0, x1, y1, frame);
+    } else {
+        for (int y = y0 + 1; y < y1; y++) {
+            line (x0, y, x1, y, frame);
+        }
+    }
+    line(x0, y1, x1, y1, frame);
+}
+
+void Spectra::draw_circle(int x, int y, int xx, int yy, int frame, bool fill) {
+    set_pixel(x + xx, y + yy, frame);
+    set_pixel(x - xx, y + yy, frame);
+    set_pixel(x + xx, y - yy, frame);
+    set_pixel(x - xx, y - yy, frame);
+    set_pixel(x + yy, y + xx, frame);
+    set_pixel(x - yy, y + xx, frame);
+    set_pixel(x + yy, y - xx, frame);
+    set_pixel(x - yy, y - xx, frame);
+    if (fill) {
+        for (int xxx = x - xx + 1; xxx < x + xx; xxx++) {
+            set_pixel(xxx, y + yy, frame);
+            set_pixel(xxx, y - yy, frame);
+        }
+        for (int xxx = x - yy + 1; xxx < x + yy; xxx++) {
+            set_pixel(xxx, y + xx, frame);
+            set_pixel(xxx, y - xx, frame);
+        }
+    }
+}
+
+void Spectra::circle(int x, int y, int r, int frame, bool fill) {
+    int xx = 0;
+    int yy = r;
+    int d = 3 - (2 * r);
+    while (xx < yy) {
+        draw_circle(x, y, xx, yy, frame, fill);
+        xx++;
+        if (d < 0) {
+            d = d + (4 * xx) + 6;
+        } else {
+            yy--;
+            d = d + (4 * (xx - yy)) + 10;
+        }
+        draw_circle(x, y, xx, yy, frame, fill);
+    }
+}
+
+void Spectra::blank() {
+    for (int n = 0; n < 30000; n++) {
+        buffer[n] = 0;
+    }
+}
+
 void Spectra::draw() {
 
     delay_ms(5);
