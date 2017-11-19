@@ -64,13 +64,13 @@ void Spectra::set_pixel(int x, int y, int frame) {
     int byte_index = i / 8;
     int bit_index = 7 - (i % 8);
     if (frame == FRAME_WHT) {
-        buffer[byte_index] |= (0<<bit_index);
-        buffer[15000 + byte_index] |= (0<<bit_index);
+        buffer[byte_index] &= ~(1<<bit_index);
+        buffer[15000 + byte_index] &= ~(1<<bit_index);
     } else if (frame == FRAME_BLK) {
         buffer[byte_index] |= (1<<bit_index);
-        buffer[15000 + byte_index] |= (0<<bit_index);
+        buffer[15000 + byte_index] &= ~(1<<bit_index);
     } else if (frame == FRAME_RED) {
-        buffer[byte_index] |= (0<<bit_index);
+        buffer[byte_index] &= ~(1<<bit_index);
         buffer[15000 + byte_index] |= (1<<bit_index);
     }
 }
