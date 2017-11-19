@@ -9,6 +9,9 @@ Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS) 
     PIN_RESET = RESET;
     PIN_BUSY = BUSY;
     PIN_BS = BS;
+    WHITE = 0;
+    BLACK = 1;
+    RED = 2;
     uint8_t buffer[30000];
 }
 
@@ -59,23 +62,23 @@ void Spectra::init() {
     delay_ms(5);
 }
 
-void Spectra::set_pixel(int x, int y, int frame) {
+void Spectra::set_pixel(int x, int y, int colour) {
     int i = ((y * EPD_WIDTH) + x);
     int byte_index = i / 8;
     int bit_index = 7 - (i % 8);
-    if (frame == FRAME_WHT) {
+    if (colour == WHITE) {
         buffer[byte_index] &= ~(1<<bit_index);
         buffer[15000 + byte_index] &= ~(1<<bit_index);
-    } else if (frame == FRAME_BLK) {
+    } else if (colour == BLACK) {
         buffer[byte_index] |= (1<<bit_index);
         buffer[15000 + byte_index] &= ~(1<<bit_index);
-    } else if (frame == FRAME_RED) {
+    } else if (colour == RED) {
         buffer[byte_index] &= ~(1<<bit_index);
         buffer[15000 + byte_index] |= (1<<bit_index);
     }
 }
 
-void Spectra::line(int x0, int y0, int x1, int y1, int frame) {
+void Spectra::line(int x0, int y0, int x1, int y1, int colour) {
     int dx = abs(x1 - x0);
     int sx = x0 < x1 ? 1 : -1;
     int dy = abs(y1 - y0);
@@ -83,7 +86,7 @@ void Spectra::line(int x0, int y0, int x1, int y1, int frame) {
     int err = (dx > dy ? dx : -dy) / 2;
     int e2;
     for(;;) {
-        set_pixel(x0, y0, frame);
+        set_pixel(x0, y0, colour);
         if (x0 == x1 && y0 == y1) break;
         e2 = err;
         if (e2 > -dx) {
@@ -97,46 +100,46 @@ void Spectra::line(int x0, int y0, int x1, int y1, int frame) {
     }
 }
 
-void Spectra::rectangle(int x0, int y0, int x1, int y1, int frame, bool fill) {
-    line(x0, y0, x1, y0, frame);
+void Spectra::rectangle(int x0, int y0, int x1, int y1, int colour, bool fill) {
+    line(x0, y0, x1, y0, colour);
     if (!fill) {
-        line(x0, y0, x1, y1, frame);
-        line(x1, y0, x1, y1, frame);
+        line(x0, y0, x1, y1, colour);
+        line(x1, y0, x1, y1, colour);
     } else {
         for (int y = y0 + 1; y < y1; y++) {
-            line (x0, y, x1, y, frame);
+            line (x0, y, x1, y, colour);
         }
     }
-    line(x0, y1, x1, y1, frame);
+    line(x0, y1, x1, y1, colour);
 }
 
-void Spectra::draw_circle(int x, int y, int xx, int yy, int frame, bool fill) {
-    set_pixel(x + xx, y + yy, frame);
-    set_pixel(x - xx, y + yy, frame);
-    set_pixel(x + xx, y - yy, frame);
-    set_pixel(x - xx, y - yy, frame);
-    set_pixel(x + yy, y + xx, frame);
-    set_pixel(x - yy, y + xx, frame);
-    set_pixel(x + yy, y - xx, frame);
-    set_pixel(x - yy, y - xx, frame);
+void Spectra::draw_circle(int x, int y, int xx, int yy, int colour, bool fill) {
+    set_pixel(x + xx, y + yy, colour);
+    set_pixel(x - xx, y + yy, colour);
+    set_pixel(x + xx, y - yy, colour);
+    set_pixel(x - xx, y - yy, colour);
+    set_pixel(x + yy, y + xx, colour);
+    set_pixel(x - yy, y + xx, colour);
+    set_pixel(x + yy, y - xx, colour);
+    set_pixel(x - yy, y - xx, colour);
     if (fill) {
         for (int xxx = x - xx + 1; xxx < x + xx; xxx++) {
-            set_pixel(xxx, y + yy, frame);
-            set_pixel(xxx, y - yy, frame);
+            set_pixel(xxx, y + yy, colour);
+            set_pixel(xxx, y - yy, colour);
         }
         for (int xxx = x - yy + 1; xxx < x + yy; xxx++) {
-            set_pixel(xxx, y + xx, frame);
-            set_pixel(xxx, y - xx, frame);
+            set_pixel(xxx, y + xx, colour);
+            set_pixel(xxx, y - xx, colour);
         }
     }
 }
 
-void Spectra::circle(int x, int y, int r, int frame, bool fill) {
+void Spectra::circle(int x, int y, int r, int colour, bool fill) {
     int xx = 0;
     int yy = r;
     int d = 3 - (2 * r);
     while (xx < yy) {
-        draw_circle(x, y, xx, yy, frame, fill);
+        draw_circle(x, y, xx, yy, colour, fill);
         xx++;
         if (d < 0) {
             d = d + (4 * xx) + 6;
@@ -144,7 +147,7 @@ void Spectra::circle(int x, int y, int r, int frame, bool fill) {
             yy--;
             d = d + (4 * (xx - yy)) + 10;
         }
-        draw_circle(x, y, xx, yy, frame, fill);
+        draw_circle(x, y, xx, yy, colour, fill);
     }
 }
 

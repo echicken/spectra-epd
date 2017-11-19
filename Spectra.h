@@ -1,9 +1,6 @@
 #ifndef Spectra_h
 #define Spectra_h
 
-#define FRAME_WHT 0
-#define FRAME_BLK 1
-#define FRAME_RED 2
 #define EPD_WIDTH 400
 
 #include <Arduino.h>
@@ -12,6 +9,9 @@ class Spectra
 {
     public:
         Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS);
+        int WHITE;
+        int BLACK;
+        int RED;
         uint8_t buffer[30000];
         void init();
         void set_pixel(int x, int y, int frame);
