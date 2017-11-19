@@ -22,9 +22,10 @@ void Spectra::send_byte(uint8_t data) {
     for (int i = 0; i < 8; i++) {
         digitalWrite(PIN_SDA, ((data>>(7-i))&1) == 1 ? HIGH : LOW);
         digitalWrite(PIN_SCL, HIGH);
+        delayMicroseconds(1);
         digitalWrite(PIN_SCL, LOW);
+        delayMicroseconds(1);
     }
-    yield();
 }
 
 void Spectra::send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16_t offset) {
@@ -42,7 +43,6 @@ void Spectra::send_data(uint8_t index, const uint8_t* data, uint16_t len, uint16
 
 void Spectra::busy_wait() {
     while (digitalRead(PIN_BUSY) != HIGH) {
-        yield();
     }
 }
 
@@ -93,7 +93,7 @@ void Spectra::draw(const uint8_t buffer[30000]) {
     send_data(0xE0, data6, 1, 0);    // Active Temperature
 
     uint8_t data7[] = { 0x1F };
-    send_data(0xE5, data7, 1, 0);    // Input Temperature: 25C
+    send_data(0xE5, data7, 1, 0);    // Input Temperature: 31C, I think
 
     send_data(0x10, buffer, 15000, 0);
     send_data(0x13, buffer, 15000, 15000);
