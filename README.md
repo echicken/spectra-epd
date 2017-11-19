@@ -15,20 +15,19 @@ Arduino library for using Pervasive Displays Spectra 4.2" E2417ES053
 #define PIN_BUSY 5
 #define PIN_BS 21
 
-uint8_t image_buffer[30000];
 Spectra spectra(PIN_SCL, PIN_SDA, PIN_CS, PIN_DC, PIN_RESET, PIN_BUSY, PIN_BS);
 
 void stripes() {
     for (int n = 0; n < 15000; n++) {
-        image_buffer[n] = ((n + 1) % 2 == 0 ? 255 : 0);
+        spectra.buffer[n] = ((n + 1) % 2 == 0 ? 255 : 0);
     }
     for (int n = 15000; n < 30000; n++) {
-        image_buffer[n] = (n % 2 == 0 ? 255 : 0);
+        spectra.buffer[n] = (n % 2 == 0 ? 255 : 0);
     }
 }
 
 void draw(void* pvParameters) {
-    spectra.draw(image_buffer);
+    spectra.draw();
     vTaskDelete(NULL); // self
 }
 

@@ -7,8 +7,10 @@ class Spectra
 {
     public:
         Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS);
+        uint8_t buffer[30000];
         void init();
-        void draw(const uint8_t buffer[30000]);
+        // void draw(const uint8_t buffer[30000]);
+        void draw();
     private:
         int PIN_SCL;
         int PIN_SDA;

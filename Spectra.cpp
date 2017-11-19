@@ -9,6 +9,7 @@ Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS) 
     PIN_RESET = RESET;
     PIN_BUSY = BUSY;
     PIN_BS = BS;
+    uint8_t buffer[30000];
 }
 
 void Spectra::delay_ms(uint32_t ms) {
@@ -57,7 +58,7 @@ void Spectra::init() {
     delay_ms(5);
 }
 
-void Spectra::draw(const uint8_t buffer[30000]) {
+void Spectra::draw() {
 
     delay_ms(5);
     digitalWrite(PIN_BS, HIGH);
