@@ -21,11 +21,12 @@ void Spectra::delay_ms(uint32_t ms) {
 
 void Spectra::send_byte(uint8_t data) {
     for (int i = 0; i < 8; i++) {
+        delayMicroseconds(1);
         digitalWrite(PIN_SDA, ((data>>(7-i))&1) == 1 ? HIGH : LOW);
+        delayMicroseconds(1);
         digitalWrite(PIN_SCL, HIGH);
         delayMicroseconds(1);
         digitalWrite(PIN_SCL, LOW);
-        delayMicroseconds(1);
     }
 }
 
@@ -169,6 +170,7 @@ void Spectra::draw() {
 
     delay_ms(5);
     digitalWrite(PIN_CS, HIGH);
+    delayMicroseconds(1);
 
     uint8_t data1[] = { 0x0E };
     send_data(0x00, data1, 1, 0);    // Panel Settings
