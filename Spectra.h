@@ -2,6 +2,7 @@
 #define Spectra_h
 
 #define EPD_WIDTH 400
+#define EPD_HEIGHT 300
 
 #include <Arduino.h>
 

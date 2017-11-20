@@ -63,18 +63,20 @@ void Spectra::init() {
 }
 
 void Spectra::set_pixel(int x, int y, int colour) {
-    int i = ((y * EPD_WIDTH) + x);
-    int byte_index = i / 8;
-    int bit_index = 7 - (i % 8);
-    if (colour == WHITE) {
-        buffer[byte_index] &= ~(1<<bit_index);
-        buffer[15000 + byte_index] &= ~(1<<bit_index);
-    } else if (colour == BLACK) {
-        buffer[byte_index] |= (1<<bit_index);
-        buffer[15000 + byte_index] &= ~(1<<bit_index);
-    } else if (colour == RED) {
-        buffer[byte_index] &= ~(1<<bit_index);
-        buffer[15000 + byte_index] |= (1<<bit_index);
+    if (x >= 0 && x < EPD_WIDTH && y >= 0 && y < EPD_HEIGHT) {
+        int i = ((y * EPD_WIDTH) + x);
+        int byte_index = i / 8;
+        int bit_index = 7 - (i % 8);
+        if (colour == WHITE) {
+            buffer[byte_index] &= ~(1<<bit_index);
+            buffer[15000 + byte_index] &= ~(1<<bit_index);
+        } else if (colour == BLACK) {
+            buffer[byte_index] |= (1<<bit_index);
+            buffer[15000 + byte_index] &= ~(1<<bit_index);
+        } else if (colour == RED) {
+            buffer[byte_index] &= ~(1<<bit_index);
+            buffer[15000 + byte_index] |= (1<<bit_index);
+        }
     }
 }
 
