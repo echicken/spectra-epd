@@ -139,8 +139,6 @@ spectra.circle(199, 149, 100, spectra.BLACK, true);
 spectra.draw();
 ```
 
-No bounds-checking is currently done, though I should really add it.  Things
-will go wrong if you attempt to draw pixels outside of the 400x300 area.  Note
-that pixel coordinates for all drawing methods are zero-based, so the valid
-range for 'x' coordinates is 0 - 399, and the valid range for 'y' coordinates is
-0 - 299.
+Attempts to set pixels outside of the valid range of x,y coordinates will be
+ignored silently.  The valid range of 'x' coordinates is 0-399.  The valid
+range of 'y' coordinates is 0-299.
