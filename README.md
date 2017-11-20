@@ -142,3 +142,19 @@ spectra.draw();
 Attempts to set pixels outside of the valid range of x,y coordinates will be
 ignored silently.  The valid range of 'x' coordinates is 0-399.  The valid
 range of 'y' coordinates is 0-299.
+
+It's okay to use a drawing method that may attempt to set pixels at invalid
+coordinates.  Only valid areas of the image buffer will be adjusted. For example
+this will produce a series of concentric circles:
+
+```
+spectra.circle(199, 149, 250, spectra.RED, true);
+spectra.circle(199, 149, 200, spectra.BLACK, true);
+spectra.circle(199, 149, 150, spectra.RED, true);
+spectra.circle(199, 149, 100, spectra.BLACK, true);
+spectra.circle(199, 149, 50, spectra.RED, true);
+spectra.draw();
+```
+
+Areas of the two outermost circles fall outside of the matrix and are ignored,
+however any valid portions of them are drawn.
