@@ -188,9 +188,7 @@ with the first 15000 bytes comprising the black frame, and the second 15000
 bytes comprising the red frame.  Bit 7 of byte 0 is the top-leftmost pixel of
 the black frame.  Bit 0 of byte 14999 is the bottom-rightmost pixel of the black
 frame.  Bit 7 of byte 15000 is the top-leftmost pixel of the red frame.  Bit 0
-of byte 29999 is the bottom-rightmost pixel of the red frame.  I plan on hosting
-a web page that will let you create a compatible file, so if none of that makes
-sense, not to worry.
+of byte 29999 is the bottom-rightmost pixel of the red frame.
 
 ```c++
 #include <Arduino.h>
@@ -226,3 +224,10 @@ void loop() {
     while (1) {}
 }
 ```
+
+### Image Conversion
+
+I host an (image conversion utility)[https://bbs.electronicchicken.com/?page=More/006-spectra-image.xjs]
+that you can use to produce files for use with this library (as in the above
+example).  Also available is the option to produce code to paste into your project
+and store the image in program memory rather than on a filesystem.
