@@ -1,6 +1,9 @@
 # spectra-epd
 Arduino library for using Pervasive Displays Spectra 4.2" E2417ES053
 
+![spectra-epd](https://bbs.electronicchicken.com/images/maya-on-epd-764-400.png)
+
+
 ### ESP-32 example
 
 ```c++
@@ -115,6 +118,8 @@ and update the display.
 
 ## Notes
 
+### Order of operations
+
 EPD image data is sent in two 'frames'.  Each frame consists of 15000 bytes, or
 one bit for each of the 120000 pixels on the display.  The first frame contains
 information on which pixels should be black.  The second frame contains data on
@@ -158,3 +163,66 @@ spectra.draw();
 
 Areas of the two outermost circles fall outside of the matrix and are ignored,
 however any valid portions of them are drawn.
+
+### Static images
+
+The following assumes that you've flashed a SPIFFS image to an ESP-32. I had to
+do some digging to find out how to do this with [mkspiffs](https://github.com/igrr/mkspiffs)
+and [esptool.py](https://github.com/espressif/esptool). (PlatformIO used to do
+this for me with the esp8266.  You may have an easier time if you're using the
+Arduino IDE.)
+
+If you have a directory called _data_ in your CWD, the following should turn its
+contents into a compatible image and then upload it to the proper area of flash
+memory on the ESP-32.  (Disclaimer: it works for me, but I make no promises of
+safety or success.)
+
+```sh
+/path/to/mkspiffs -d 5 -c data -a -s 1503232 -b 4096 -p 256 fs.img
+esptool.py write_flash 0x291000 fs.img
+```
+
+In this example, there would have been a file called _image.bin_ sitting inside
+of the _data_ directory mentioned above. _image.bin_ should be 30000 bytes long,
+with the first 15000 bytes comprising the black frame, and the second 15000
+bytes comprising the red frame.  Bit 7 of byte 0 is the top-leftmost pixel of
+the black frame.  Bit 0 of byte 14999 is the bottom-rightmost pixel of the black
+frame.  Bit 7 of byte 15000 is the top-leftmost pixel of the red frame.  Bit 0
+of byte 29999 is the bottom-rightmost pixel of the red frame.  I plan on hosting
+a web page that will let you create a compatible file, so if none of that makes
+sense, not to worry.
+
+```c++
+#include <Arduino.h>
+#include "Spectra.h"
+#include "FS.h"
+#include "SPIFFS.h"
+
+#define PIN_SCL 14
+#define PIN_SDA 16
+#define PIN_CS 12
+#define PIN_DC 13
+#define PIN_RESET 4
+#define PIN_BUSY 5
+#define PIN_BS 21
+
+Spectra spectra(PIN_SCL, PIN_SDA, PIN_CS, PIN_DC, PIN_RESET, PIN_BUSY, PIN_BS);
+
+void draw(void* pvParameters) {
+    spectra.draw();
+    vTaskDelete(NULL); // self
+}
+
+void setup() {
+    spectra_init();
+    SPIFFS.begin(false, "", 10);
+}
+
+void loop() {
+    File f = SPIFFS.open("/image.bin");
+    f.read(spectra.buffer, 30000);
+    f.close();
+    xTaskCreatePinnedToCore(draw, "spectra", 1024, NULL, 20, NULL, 1);
+    while (1) {}
+}
+```
