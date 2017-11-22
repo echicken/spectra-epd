@@ -235,7 +235,7 @@ void loop() {
 
 ### Image Conversion
 
-I host an (image conversion utility)[https://bbs.electronicchicken.com/?page=More/006-spectra-image.xjs]
+I host an [image conversion utility](https://bbs.electronicchicken.com/?page=More/006-spectra-image.xjs)
 that you can use to produce files for use with this library (as in the above
 example).  Also available is the option to produce code to paste into your project
 and store the image in program memory rather than on a filesystem.
