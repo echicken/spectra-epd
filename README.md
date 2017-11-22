@@ -3,6 +3,14 @@ Arduino library for using Pervasive Displays Spectra 4.2" E2417ES053
 
 ![spectra-epd](https://bbs.electronicchicken.com/images/maya-on-epd-764-400.png)
 
+* [ESP-32 example](#esp-32-example)
+* [Constructor](#constructor)
+* [Properties](#properties)
+* [Methods](#methods)
+* [Notes](#notes)
+    * [Order of operations](#order-of-operations)
+    * [Static images](#static-images)
+    * [Image Conversion](#image-conversion)
 
 ### ESP-32 example
 
