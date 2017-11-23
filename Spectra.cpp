@@ -153,6 +153,21 @@ void Spectra::circle(int x, int y, int r, int colour, bool fill) {
     }
 }
 
+void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, bool transparent, int colour) {
+    if (transparent || colour == WHITE) {
+
+    } else {
+        int idx = ((y * EPD_WIDTH) + x) / 8; // Byte index to start adding to Spectra::buffer
+        if (colour == RED) idx = idx + 15000;
+        for (int i = 0; i < ((w * h) / 8); i++) { // For each byte in 'data'
+            buffer[idx] = data[i];
+            if ((i + 1) % (w / 8) == 0) {
+                idx = idx + (EPD_WIDTH / 8);
+            }
+        }
+    }
+}
+
 void Spectra::blank() {
     for (int n = 0; n < 30000; n++) {
         buffer[n] = 0;
