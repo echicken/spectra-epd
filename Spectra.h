@@ -3,6 +3,7 @@
 
 #define EPD_WIDTH 400
 #define EPD_HEIGHT 300
+#define EPD_BUFFER 30000
 
 #include <Arduino.h>
 
@@ -13,7 +14,7 @@ class Spectra
         int WHITE;
         int BLACK;
         int RED;
-        uint8_t buffer[30000];
+        uint8_t buffer[EPD_BUFFER];
         void init();
         void set_pixel(int x, int y, int colour);
         void line(int x0, int y0, int x1, int y1, int colour);

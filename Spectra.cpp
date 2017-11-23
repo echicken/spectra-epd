@@ -12,7 +12,7 @@ Spectra::Spectra(int SCL, int SDA, int CS, int DC, int RESET, int BUSY, int BS) 
     WHITE = 0;
     BLACK = 1;
     RED = 2;
-    uint8_t buffer[30000];
+    uint8_t buffer[EPD_BUFFER];
 }
 
 void Spectra::delay_ms(uint32_t ms) {
@@ -69,13 +69,13 @@ void Spectra::set_pixel(int x, int y, int colour) {
         int bit_index = 7 - (i % 8);
         if (colour == WHITE) {
             buffer[byte_index] &= ~(1<<bit_index);
-            buffer[15000 + byte_index] &= ~(1<<bit_index);
+            buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<bit_index);
         } else if (colour == BLACK) {
             buffer[byte_index] |= (1<<bit_index);
-            buffer[15000 + byte_index] &= ~(1<<bit_index);
+            buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<bit_index);
         } else if (colour == RED) {
             buffer[byte_index] &= ~(1<<bit_index);
-            buffer[15000 + byte_index] |= (1<<bit_index);
+            buffer[(EPD_BUFFER / 2) + byte_index] |= (1<<bit_index);
         }
     }
 }
@@ -158,18 +158,22 @@ void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, bool tr
 
     } else {
         int idx = ((y * EPD_WIDTH) + x) / 8; // Byte index to start adding to Spectra::buffer
-        if (colour == RED) idx = idx + 15000;
+        if (colour == RED) idx = idx + (EPD_BUFFER / 2);
         for (int i = 0; i < ((w * h) / 8); i++) { // For each byte in 'data'
-            buffer[idx] = data[i];
-            if ((i + 1) % (w / 8) == 0) {
-                idx = idx + (EPD_WIDTH / 8);
+            if (idx < EPD_BUFFER) {
+                buffer[idx] = data[i];
+                if ((i + 1) % (w / 8) == 0) {
+                    idx = idx + (EPD_WIDTH / 8);
+                }
+            } else { // Don't attempt to set outside of buffer's range
+                i = ((w * h) / 8); // break
             }
         }
     }
 }
 
 void Spectra::blank() {
-    for (int n = 0; n < 30000; n++) {
+    for (int n = 0; n < EPD_BUFFER; n++) {
         buffer[n] = 0;
     }
 }
@@ -213,8 +217,8 @@ void Spectra::draw() {
     uint8_t data7[] = { 0x1F };
     send_data(0xE5, data7, 1, 0);    // Input Temperature: 31C, I think
 
-    send_data(0x10, buffer, 15000, 0);
-    send_data(0x13, buffer, 15000, 15000);
+    send_data(0x10, buffer, (EPD_BUFFER / 2), 0);
+    send_data(0x13, buffer, (EPD_BUFFER / 2), (EPD_BUFFER / 2));
     delay_ms(50);
 
     uint8_t data8[] = { 0x00 };
