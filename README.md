@@ -1,7 +1,7 @@
 # spectra-epd
 Arduino library for using Pervasive Displays Spectra 4.2" E2417ES053
 
-![spectra-epd](https://bbs.electronicchicken.com/images/maya-on-epd-764-400.png)
+![spectra-epd](https://bbs.electronicchicken.com/images/maya-on-epd-posterized.png)
 
 * [ESP-32 example](#esp-32-example)
 * [Constructor](#constructor)
