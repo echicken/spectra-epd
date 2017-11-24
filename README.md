@@ -102,7 +102,7 @@ Assign whatever pins work for you for these purposes:
     * Each byte represents eight pixels on the EPD
     * The first 15000 bytes are the black frame
     * The last 15000 bytes are the red frame
-    * Each byte is MSB first.  Bit 7 of Byte 0 is the first pixel on the EPD, and so on.
+    * Each byte is drawn MSB first.  Bit 7 of Byte 0 is the first pixel on the EPD, and so on.
 
 ## Methods
 
