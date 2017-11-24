@@ -122,11 +122,12 @@ All of these methods return void.
     * Draw a rectangle from top left x0, y0 to bottom right x1, y1 in a given colour, filled or not
 * circle(int x, int y, int r, int colour, bool fill);
     * Draw a circle with centre point x, y and radius r, of a given colour, filled or not
-* draw_rect(const uint8_t* data, int x, int y, int w, int h, bool transparent, int colour)
+* draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale)
     * Blit the contents of array _data_ into the display buffer at top-left coordinates x, y
     * w and h are the width and height (in pixels) of the image contained in _data_. The length of _data_ should equal or exceed ((w * h) / 8)
-    * _transparent_ is not yet implemented, but will control whether unset pixels in _data_ are unset (white) in the image buffer, or left as is
-    * _colour_ is as usual, except that white currently does nothing, but will work once transparency is implemented
+    * _colour_ is as usual, however supplying WHITE does nothing unless _transparent_ is _true_
+    * _transparent_ determines whether the entire contents of _data_ are added to the image buffer, or just those bits which are set
+    * _scale_ is not yet implemented
 * draw()
     * Send the current image buffer to the EPD (ie. apply changes and update the physical display)
 
