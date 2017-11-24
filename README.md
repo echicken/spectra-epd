@@ -99,7 +99,7 @@ Assign whatever pins work for you for these purposes:
 * buffer
     * This is the image buffer that will be sent to the EPD when Spectra.draw() is called
     * uint8_t[30000]
-    * Every byte represents eight pixels on the EPD
+    * Each byte represents eight pixels on the EPD
     * The first 15000 bytes are the black frame
     * The last 15000 bytes are the red frame
     * Each byte is MSB first.  Bit 7 of Byte 0 is the first pixel on the EPD, and so on.
