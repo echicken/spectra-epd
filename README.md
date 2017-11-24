@@ -138,8 +138,10 @@ All of these methods return void.
 EPD image data is sent in two 'frames'.  Each frame consists of 15000 bytes, or
 one bit for each of the 120000 pixels on the display.  The first frame contains
 information on which pixels should be black.  The second frame contains data on
-which pixels should be red.  A pixel left unset in both frames remains white. A
-pixel set in both frames will be drawn in red.
+which pixels should be red.  A bit (pixel) left unset in both frames remains
+white. A bit set in the black frame but not in the red frame will be drawn in
+black.  A bit set in the red frame will be drawn in red, regardless of whether
+it was already set in the black frame.
 
 The order in which any of the above drawing methods are called will affect how
 the display actually gets drawn in the end.  This would result in a big red
