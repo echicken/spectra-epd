@@ -66,16 +66,16 @@ void Spectra::set_pixel(int x, int y, int colour) {
     if (x >= 0 && x < EPD_WIDTH && y >= 0 && y < EPD_HEIGHT) {
         int i = ((y * EPD_WIDTH) + x);
         int byte_index = i / 8;
-        int bit_index = 7 - (i % 8);
+        int bit = (1<<(7-(i%8)));
         if (colour == WHITE) {
-            buffer[byte_index] &= ~(1<<bit_index);
-            buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<bit_index);
+            buffer[byte_index] &= ~bit;
+            buffer[EPD_FRAME + byte_index] &= ~bit;
         } else if (colour == BLACK) {
-            buffer[byte_index] |= (1<<bit_index);
-            buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<bit_index);
+            buffer[byte_index] |= bit;
+            buffer[EPD_FRAME + byte_index] &= ~bit;
         } else if (colour == RED) {
-            buffer[byte_index] &= ~(1<<bit_index);
-            buffer[(EPD_BUFFER / 2) + byte_index] |= (1<<bit_index);
+            buffer[byte_index] &= ~bit;
+            buffer[EPD_FRAME + byte_index] |= bit;
         }
     }
 }
@@ -154,9 +154,11 @@ void Spectra::circle(int x, int y, int r, int colour, bool fill) {
 }
 
 void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale) {
+    int dwb = (w / 8); // data's width, in bytes
+    int dsb = ((w * h) / 8); // data's size, in bytes
     if (scale > 1) {
         // This is unequivocally one of the worst things I've ever written.
-        for (int i = 0; i < ((w * h) / 8); i++) {
+        for (int i = 0; i < dsb; i++) {
             for (int xx = 0; xx < 8; xx++) {
                 int cx = x + (xx * scale);
                 for (int yy = 0; yy < scale; yy++) {
@@ -172,41 +174,42 @@ void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int col
                     }
                 }
             }
-            if ((i + 1) % (w / 8) == 0) {
+            if ((i + 1) % dwb == 0) {
                 y = y + scale;
             }
         }
     } else if (transparent || colour == WHITE) {
         int byte_index = ((y * EPD_WIDTH) + x) / 8;
-        for (int i = 0; i < ((w * h) / 8); i++) {
+        for (int i = 0; i < dsb; i++) {
             for (int xx = 0; xx < 8; xx++) {
-                if (data[i]&(1<<(7-xx))) {
+                int bit = (1<<(7-xx));
+                if (data[i]&bit) {
                     if (colour == BLACK) {
-                        buffer[byte_index] |= (1<<(7-xx));
+                        buffer[byte_index] |= bit;
                     } else if (colour == RED) {
-                        buffer[(EPD_BUFFER / 2) + byte_index] |= (1<<(7-xx));
+                        buffer[EPD_FRAME + byte_index] |= bit;
                     } else if (colour == WHITE) {
-                        buffer[byte_index] &= ~(1<<(7-xx));
-                        buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<(7-xx));
+                        buffer[byte_index] &= ~bit;
+                        buffer[EPD_FRAME + byte_index] &= ~bit;
                     }
                 } else if (!transparent) {
-                    buffer[byte_index] &= ~(1<<(7-xx));
-                    buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<(7-xx));
+                    buffer[byte_index] &= ~bit;
+                    buffer[EPD_FRAME + byte_index] &= ~bit;
                 }
             }
-            if ((i + 1) % (w / 8) == 0) {
-                byte_index = byte_index + (EPD_WIDTH / 8);
+            if ((i + 1) % dwb == 0) {
+                byte_index = byte_index + EPD_BYTE_WIDTH;
             }
         }
     } else {
         int byte_index = ((y * EPD_WIDTH) + x) / 8;
-        if (colour == RED) byte_index = byte_index + (EPD_BUFFER / 2);
-        for (int i = 0; i < ((w * h) / 8); i++) {
+        if (colour == RED) byte_index = byte_index + EPD_FRAME;
+        for (int i = 0; i < dsb; i++) {
             if (byte_index < EPD_BUFFER) {
                 buffer[byte_index] = data[i];
             }
-            if ((i + 1) % (w / 8) == 0) {
-                byte_index = byte_index + (EPD_WIDTH / 8);
+            if ((i + 1) % dwb == 0) {
+                byte_index = byte_index + EPD_BYTE_WIDTH;
             }
         }
     }
@@ -257,8 +260,8 @@ void Spectra::draw() {
     uint8_t data7[] = { 0x1F };
     send_data(0xE5, data7, 1, 0);    // Input Temperature: 31C, I think
 
-    send_data(0x10, buffer, (EPD_BUFFER / 2), 0);
-    send_data(0x13, buffer, (EPD_BUFFER / 2), (EPD_BUFFER / 2));
+    send_data(0x10, buffer, EPD_FRAME, 0);
+    send_data(0x13, buffer, EPD_FRAME, EPD_FRAME);
     delay_ms(50);
 
     uint8_t data8[] = { 0x00 };

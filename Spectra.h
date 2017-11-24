@@ -3,7 +3,9 @@
 
 #define EPD_WIDTH 400
 #define EPD_HEIGHT 300
+#define EPD_BYTE_WIDTH 50
 #define EPD_BUFFER 30000
+#define EPD_FRAME 15000
 
 #include <Arduino.h>
 
