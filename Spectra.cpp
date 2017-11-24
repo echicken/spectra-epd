@@ -154,10 +154,30 @@ void Spectra::circle(int x, int y, int r, int colour, bool fill) {
 }
 
 void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale) {
-    int byte_index = ((y * EPD_WIDTH) + x) / 8;
     if (scale > 1) {
-
+        // This is unequivocally one of the worst things I've ever written.
+        for (int i = 0; i < ((w * h) / 8); i++) {
+            for (int xx = 0; xx < 8; xx++) {
+                int cx = x + (xx * scale);
+                for (int yy = 0; yy < scale; yy++) {
+                    int cy = y + yy;
+                    if (data[i]&(1<<(7-xx))) {
+                        for (int r = 0; r < scale; r++) {
+                            set_pixel(cx + r, cy, colour);
+                        }
+                    } else if (!transparent) {
+                        for (int r = 0; r < scale; r++) {
+                            set_pixel(cx + r, cy, WHITE);
+                        }
+                    }
+                }
+            }
+            if ((i + 1) % (w / 8) == 0) {
+                y = y + scale;
+            }
+        }
     } else if (transparent || colour == WHITE) {
+        int byte_index = ((y * EPD_WIDTH) + x) / 8;
         for (int i = 0; i < ((w * h) / 8); i++) {
             for (int xx = 0; xx < 8; xx++) {
                 if (data[i]&(1<<(7-xx))) {
@@ -179,6 +199,7 @@ void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int col
             }
         }
     } else {
+        int byte_index = ((y * EPD_WIDTH) + x) / 8;
         if (colour == RED) byte_index = byte_index + (EPD_BUFFER / 2);
         for (int i = 0; i < ((w * h) / 8); i++) {
             if (byte_index < EPD_BUFFER) {
