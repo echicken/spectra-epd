@@ -127,7 +127,7 @@ All of these methods return void.
     * w and h are the width and height (in pixels) of the image contained in _data_. The length of _data_ should equal or exceed ((w * h) / 8)
     * _colour_ is as usual, however supplying WHITE does nothing unless _transparent_ is _true_
     * _transparent_ determines whether the entire contents of _data_ are added to the image buffer, or just those bits which are set
-    * _scale_ is not yet implemented
+    * When using _scale_, leave _w_ and _h_ at the _original_ size of the data; each pixel will be drawn _scale_ times horizontally and vertically
 * draw()
     * Send the current image buffer to the EPD (ie. apply changes and update the physical display)
 
