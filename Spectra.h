@@ -20,7 +20,7 @@ class Spectra
         void line(int x0, int y0, int x1, int y1, int colour);
         void rectangle(int x0, int y0, int x1, int y1, int colour, bool fill);
         void circle(int x, int y, int r, int colour, bool fill);
-        void draw_rect(const uint8_t* data, int x, int y, int w, int h, bool transparent, int colour);
+        void draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent = false, int scale = 1);
         void blank();
         void draw();
     private:

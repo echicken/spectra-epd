@@ -153,20 +153,39 @@ void Spectra::circle(int x, int y, int r, int colour, bool fill) {
     }
 }
 
-void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, bool transparent, int colour) {
-    if (transparent || colour == WHITE) {
+void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale) {
+    int byte_index = ((y * EPD_WIDTH) + x) / 8;
+    if (scale > 1) {
 
-    } else {
-        int idx = ((y * EPD_WIDTH) + x) / 8; // Byte index to start adding to Spectra::buffer
-        if (colour == RED) idx = idx + (EPD_BUFFER / 2);
-        for (int i = 0; i < ((w * h) / 8); i++) { // For each byte in 'data'
-            if (idx < EPD_BUFFER) {
-                buffer[idx] = data[i];
-                if ((i + 1) % (w / 8) == 0) {
-                    idx = idx + (EPD_WIDTH / 8);
+    } else if (transparent || colour == WHITE) {
+        for (int i = 0; i < ((w * h) / 8); i++) {
+            for (int xx = 0; xx < 8; xx++) {
+                if (data[i]&(1<<(7-xx))) {
+                    if (colour == BLACK) {
+                        buffer[byte_index] |= (1<<(7-xx));
+                    } else if (colour == RED) {
+                        buffer[(EPD_BUFFER / 2) + byte_index] |= (1<<(7-xx));
+                    } else if (colour == WHITE) {
+                        buffer[byte_index] &= ~(1<<(7-xx));
+                        buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<(7-xx));
+                    }
+                } else if (!transparent) {
+                    buffer[byte_index] &= ~(1<<(7-xx));
+                    buffer[(EPD_BUFFER / 2) + byte_index] &= ~(1<<(7-xx));
                 }
-            } else { // Don't attempt to set outside of buffer's range
-                i = ((w * h) / 8); // break
+            }
+            if ((i + 1) % (w / 8) == 0) {
+                byte_index = byte_index + (EPD_WIDTH / 8);
+            }
+        }
+    } else {
+        if (colour == RED) byte_index = byte_index + (EPD_BUFFER / 2);
+        for (int i = 0; i < ((w * h) / 8); i++) {
+            if (byte_index < EPD_BUFFER) {
+                buffer[byte_index] = data[i];
+            }
+            if ((i + 1) % (w / 8) == 0) {
+                byte_index = byte_index + (EPD_WIDTH / 8);
             }
         }
     }
