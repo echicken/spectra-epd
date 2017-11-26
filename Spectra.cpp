@@ -157,25 +157,25 @@ void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int col
     int dwb = (w / 8); // data's width, in bytes
     int dsb = ((w * h) / 8); // data's size, in bytes
     // This is, unequivocally, one of the most horrendous things I've ever written.
-    for (int i = 0; i < dsb; i++) {
-        int xo = (i % dwb) * 8;
-        for (int xx = 0; xx < 8; xx++) {
-            int cx = x + xo + (xx * scale);
-            for (int yy = 0; yy < scale; yy++) {
-                int cy = y + yy;
-                if (data[i]&(1<<(7-xx))) {
-                    for (int r = 0; r < scale; r++) {
+    for (int i = 0; i < dsb; i++) { // For each byte in data
+        int xo = (i % dwb) * 8; // x-offset for the first pixel in this byte
+        for (int xx = 0; xx < 8; xx++) { // For each pixel in this byte
+            int cx = x + xo + (xx * scale); // Starting x position of this rect, plus offset, plus offset for repeated pixels drawn before this
+            for (int yy = 0; yy < scale; yy++) { // Repeat this pixel 'scale' times vertically
+                int cy = y + yy; // Current y position plus which repeat of the row we're on
+                if (data[i]&(1<<(7-xx))) { // If this pixel is set
+                    for (int r = 0; r < scale; r++) { // Repeat this pixel 'scale' times horizontally
                         set_pixel(cx + r, cy, colour);
                     }
-                } else if (!transparent) {
-                    for (int r = 0; r < scale; r++) {
+                } else if (!transparent) { // If this pixel is not set but we're good to unset existing buffer contents
+                    for (int r = 0; r < scale; r++) { // Repeat this pixel 'scale' times horizontally
                         set_pixel(cx + r, cy, WHITE);
                     }
                 }
             }
         }
-        if ((i + 1) % dwb == 0) {
-            y = y + scale;
+        if ((i + 1) % dwb == 0) { // This byte was the last eight pixels of a row in our rect
+            y = y + scale; // The next row will be drawn 'scale' rows further down on the display
         }
     }
 }
