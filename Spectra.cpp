@@ -158,8 +158,9 @@ void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int col
     int dsb = ((w * h) / 8); // data's size, in bytes
     // This is, unequivocally, one of the most horrendous things I've ever written.
     for (int i = 0; i < dsb; i++) {
+        int xo = (i % dwb) * 8;
         for (int xx = 0; xx < 8; xx++) {
-            int cx = x + (xx * scale);
+            int cx = x + xo + (xx * scale);
             for (int yy = 0; yy < scale; yy++) {
                 int cy = y + yy;
                 if (data[i]&(1<<(7-xx))) {
