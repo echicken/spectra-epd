@@ -156,61 +156,25 @@ void Spectra::circle(int x, int y, int r, int colour, bool fill) {
 void Spectra::draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale) {
     int dwb = (w / 8); // data's width, in bytes
     int dsb = ((w * h) / 8); // data's size, in bytes
-    if (scale > 1) {
-        // This is unequivocally one of the worst things I've ever written.
-        for (int i = 0; i < dsb; i++) {
-            for (int xx = 0; xx < 8; xx++) {
-                int cx = x + (xx * scale);
-                for (int yy = 0; yy < scale; yy++) {
-                    int cy = y + yy;
-                    if (data[i]&(1<<(7-xx))) {
-                        for (int r = 0; r < scale; r++) {
-                            set_pixel(cx + r, cy, colour);
-                        }
-                    } else if (!transparent) {
-                        for (int r = 0; r < scale; r++) {
-                            set_pixel(cx + r, cy, WHITE);
-                        }
-                    }
-                }
-            }
-            if ((i + 1) % dwb == 0) {
-                y = y + scale;
-            }
-        }
-    } else if (transparent || colour == WHITE) {
-        int byte_index = ((y * EPD_WIDTH) + x) / 8;
-        for (int i = 0; i < dsb; i++) {
-            for (int xx = 0; xx < 8; xx++) {
-                int bit = (1<<(7-xx));
-                if (data[i]&bit) {
-                    if (colour == BLACK) {
-                        buffer[byte_index] |= bit;
-                    } else if (colour == RED) {
-                        buffer[EPD_FRAME + byte_index] |= bit;
-                    } else if (colour == WHITE) {
-                        buffer[byte_index] &= ~bit;
-                        buffer[EPD_FRAME + byte_index] &= ~bit;
+    // This is, unequivocally, one of the most horrendous things I've ever written.
+    for (int i = 0; i < dsb; i++) {
+        for (int xx = 0; xx < 8; xx++) {
+            int cx = x + (xx * scale);
+            for (int yy = 0; yy < scale; yy++) {
+                int cy = y + yy;
+                if (data[i]&(1<<(7-xx))) {
+                    for (int r = 0; r < scale; r++) {
+                        set_pixel(cx + r, cy, colour);
                     }
                 } else if (!transparent) {
-                    buffer[byte_index] &= ~bit;
-                    buffer[EPD_FRAME + byte_index] &= ~bit;
+                    for (int r = 0; r < scale; r++) {
+                        set_pixel(cx + r, cy, WHITE);
+                    }
                 }
             }
-            if ((i + 1) % dwb == 0) {
-                byte_index = byte_index + EPD_BYTE_WIDTH;
-            }
         }
-    } else {
-        int byte_index = ((y * EPD_WIDTH) + x) / 8;
-        if (colour == RED) byte_index = byte_index + EPD_FRAME;
-        for (int i = 0; i < dsb; i++) {
-            if (byte_index < EPD_BUFFER) {
-                buffer[byte_index] = data[i];
-            }
-            if ((i + 1) % dwb == 0) {
-                byte_index = byte_index + EPD_BYTE_WIDTH;
-            }
+        if ((i + 1) % dwb == 0) {
+            y = y + scale;
         }
     }
 }
