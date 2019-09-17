@@ -68,37 +68,37 @@ Spectra spectra(PIN_SCL, PIN_SDA, PIN_CS, PIN_DC, PIN_RESET, PIN_BUSY, PIN_BS);
 All pins are digital outputs, except for PIN_BUSY which is a digital input.
 Assign whatever pins work for you for these purposes:
 
-* **PIN_SCL
+* **PIN_SCL**
     * SPI clock
     * Pin 7 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
-* **PIN_SDA
+* **PIN_SDA**
     * SPI MOSI
     * Pin 15 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
-* **PIN_CS
+* **PIN_CS**
     * SPI Chip Select
     * Pin 19 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
-* **PIN_DC
+* **PIN_DC**
     * SPI Data/Command
     * Pin 9 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
-* **PIN_RESET
+* **PIN_RESET**
     * EPD reset pin
     * Pin 10 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
-* **PIN_BUSY
+* **PIN_BUSY**
     * EPD busy state
     * Pin 8 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
-* **PIN_BS
+* **PIN_BS**
     * EPD enable / panel On pin
     * Pin 11 on J5 of _EPD Extension Board Gen2 (EXT2)-01_
 
 ## Properties
 
-* **WHITE
+* **WHITE**
     * Use this as the 'colour' parameter for 'white' when calling a drawing method
-* **BLACK
+* **BLACK**
     * Use this as the 'colour' parameter for 'black' when calling a drawing method
-* **RED
+* **RED**
     * Use this as the 'colour' parameter for 'red' when calling a drawing method
-* **buffer
+* **buffer**
     * This is the image buffer that will be sent to the EPD when Spectra.draw() is called
     * uint8_t[30000]
     * Each byte represents eight pixels on the EPD
@@ -113,24 +113,24 @@ the EPD.  You must call Spectra.draw() to send data to and update the display.
 
 All of these methods return void.
 
-* **set_pixel(int x, int y, int colour)
+* **set_pixel(int x, int y, int colour)**
     * Set pixel at zero-based coordinates x, y to 'colour'
     * The first pixel is 0:0, the last pixel is 399:299
-* **blank()
+* **blank()**
     * Clear the contents of the image buffer (ie. set every pixel to white)
-* **line(int x0, int y0, int x1, int y1, int colour)
+* **line(int x0, int y0, int x1, int y1, int colour)**
     * Draw a line from x0, y0 to x1, y1 in a given colour
-* **rectangle(int x0, int y0, int x1, int y1, int colour, bool fill)
+* **rectangle(int x0, int y0, int x1, int y1, int colour, bool fill)**
     * Draw a rectangle from top left x0, y0 to bottom right x1, y1 in a given colour, filled or not
-* **circle(int x, int y, int r, int colour, bool fill);
+* **circle(int x, int y, int r, int colour, bool fill)**
     * Draw a circle with centre point x, y and radius r, of a given colour, filled or not
-* **draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale)
+* **draw_rect(const uint8_t* data, int x, int y, int w, int h, int colour, bool transparent, int scale)**
     * Blit the contents of array _data_ into the display buffer at top-left coordinates x, y
     * w and h are the width and height (in pixels) of the image contained in _data_. The length of _data_ should equal or exceed ((w * h) / 8)
     * _colour_ is as usual, however supplying WHITE does nothing unless _transparent_ is _true_
     * _transparent_ determines whether the entire contents of _data_ are added to the image buffer, or just those bits which are set
     * When using _scale_, leave _w_ and _h_ at the _original_ size of the data; each pixel will be drawn _scale_ times horizontally and vertically
-* **draw()
+* **draw()**
     * Send the current image buffer to the EPD (ie. apply changes and update the physical display)
 
 ## Notes
